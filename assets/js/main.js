@@ -128,7 +128,7 @@ document.addEventListener("DOMContentLoaded", () => {
               personaje.y < obstaculo.y + obstaculo.height &&
               personaje.y + personaje.height > obstaculo.y
           ) {
-              alert("¡Colisión detectada con un obstáculo!");
+              // Colisión detectada
               return;
           }
       }
