@@ -39,9 +39,24 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   };
 
+  // Función para detectar colisiones
+  const detectarColision = () => {
+      for (let obstaculo of obstaculos) {
+          if (
+              personaje.x < obstaculo.x + obstaculo.width &&
+              personaje.x + personaje.width > obstaculo.x &&
+              personaje.y < obstaculo.y + obstaculo.height &&
+              personaje.y + personaje.height > obstaculo.y
+          ) {
+              alert("¡Colisión detectada con un obstáculo!");
+              return;
+          }
+      }
+  };
+
   // Función para mover el personaje
   const moverPersonaje = (event) => {
-      switch(event.key) {
+      switch (event.key) {
           case "ArrowUp":
               personaje.y -= personaje.speed;
               break;
@@ -64,6 +79,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Redibujar todo
       dibujarTodo();
+
+      // Verificar si hay una colisión con algún obstáculo
+      detectarColision();
   };
 
   // Función para dibujar todo el escenario
