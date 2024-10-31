@@ -184,7 +184,7 @@ document.addEventListener("DOMContentLoaded", () => {
       };
 
       // Ajustar el tamaño de la bala según la dirección
-      if (nuevaBala.direccion === "ArrowUp" || nuevaBala.direccion === "ArrowDown" || nuevaBala.direccion === "KeyW" || nuevaBala.direccion === "KeyS") {
+      if (nuevaBala.direccion === "ArrowUp" || nuevaBala.direccion === "ArrowDown") {
           nuevaBala.width = 5;
           nuevaBala.height = 10;
       }
@@ -217,21 +217,25 @@ document.addEventListener("DOMContentLoaded", () => {
               break;
 
           // Controles del segundo personaje
-          case "KeyW":
+          case "w":
+          case "W":
               personaje2.y -= personaje2.speed;
-              personaje2.direccion = "KeyW";
+              personaje2.direccion = "ArrowUp";
               break;
-          case "KeyS":
+          case "s":
+          case "S":
               personaje2.y += personaje2.speed;
-              personaje2.direccion = "KeyS";
+              personaje2.direccion = "ArrowDown";
               break;
-          case "KeyA":
+          case "a":
+          case "A":
               personaje2.x -= personaje2.speed;
-              personaje2.direccion = "KeyA";
+              personaje2.direccion = "ArrowLeft";
               break;
-          case "KeyD":
+          case "d":
+          case "D":
               personaje2.x += personaje2.speed;
-              personaje2.direccion = "KeyD";
+              personaje2.direccion = "ArrowRight";
               break;
           case "Enter":
               dispararBala(personaje2);
