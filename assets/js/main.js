@@ -19,6 +19,9 @@ document.addEventListener("DOMContentLoaded", () => {
       { x: 600, y: 100, width: 50, height: 50, color: "red", speedX: 1, speedY: -2 }
   ];
 
+  // Lista de balas disparadas por el personaje
+  const balas = [];
+
   // Función para dibujar el fondo
   const dibujarFondo = () => {
       ctx.fillStyle = "#e0e0e0"; // Color gris claro
@@ -37,6 +40,26 @@ document.addEventListener("DOMContentLoaded", () => {
           ctx.fillStyle = obstaculo.color;
           ctx.fillRect(obstaculo.x, obstaculo.y, obstaculo.width, obstaculo.height);
       });
+  };
+
+  // Función para dibujar las balas
+  const dibujarBalas = () => {
+      balas.forEach(bala => {
+          ctx.fillStyle = bala.color;
+          ctx.fillRect(bala.x, bala.y, bala.width, bala.height);
+      });
+  };
+
+  // Función para mover las balas
+  const moverBalas = () => {
+      for (let i = balas.length - 1; i >= 0; i--) {
+          balas[i].x += balas[i].speed;
+
+          // Eliminar balas que salgan del canvas
+          if (balas[i].x > canvas.width) {
+              balas.splice(i, 1);
+          }
+      }
   };
 
   // Función para mover los obstáculos
@@ -71,6 +94,19 @@ document.addEventListener("DOMContentLoaded", () => {
       }
   };
 
+  // Función para disparar balas
+  const dispararBala = () => {
+      const nuevaBala = {
+          x: personaje.x + personaje.width,
+          y: personaje.y + personaje.height / 2 - 5,
+          width: 10,
+          height: 5,
+          color: "black",
+          speed: 7
+      };
+      balas.push(nuevaBala);
+  };
+
   // Función para mover el personaje
   const moverPersonaje = (event) => {
       switch (event.key) {
@@ -85,6 +121,9 @@ document.addEventListener("DOMContentLoaded", () => {
               break;
           case "ArrowRight":
               personaje.x += personaje.speed;
+              break;
+          case " ":
+              dispararBala();
               break;
       }
 
@@ -104,11 +143,13 @@ document.addEventListener("DOMContentLoaded", () => {
       dibujarFondo();
       dibujarPersonaje();
       dibujarObstaculos();
+      dibujarBalas();
   };
 
   // Bucle principal del juego
   const gameLoop = () => {
       moverObstaculos();    // Mover obstáculos
+      moverBalas();         // Mover balas
       dibujarTodo();        // Redibujar todo
       detectarColision();   // Detectar colisiones
       requestAnimationFrame(gameLoop); // Llamar a gameLoop de nuevo
