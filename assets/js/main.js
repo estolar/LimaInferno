@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const canvas = document.getElementById("juego");
   const ctx = canvas.getContext("2d");
 
-  // Configuración del personaje
+  // Configuración del primer personaje
   const personaje = {
       x: 50,
       y: 50,
@@ -10,7 +10,20 @@ document.addEventListener("DOMContentLoaded", () => {
       height: 30,
       color: "blue",
       speed: 5,
-      direccion: "ArrowRight" // Dirección inicial del personaje
+      direccion: "ArrowRight", // Dirección inicial del personaje
+      vidas: 3 // Inicializar con 3 vidas
+  };
+
+  // Configuración del segundo personaje
+  const personaje2 = {
+      x: 700,
+      y: 500,
+      width: 30,
+      height: 30,
+      color: "green",
+      speed: 5,
+      direccion: "KeyD", // Dirección inicial del personaje
+      vidas: 3 // Inicializar con 3 vidas
   };
 
   // Lista de obstáculos con velocidad
@@ -20,7 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
       { x: 600, y: 100, width: 50, height: 50, color: "red", speedX: 1, speedY: -2 }
   ];
 
-  // Lista de balas disparadas por el personaje
+  // Lista de balas disparadas por los personajes
   const balas = [];
 
   // Función para dibujar el fondo
@@ -29,10 +42,19 @@ document.addEventListener("DOMContentLoaded", () => {
       ctx.fillRect(0, 0, canvas.width, canvas.height);
   };
 
-  // Función para dibujar el personaje
-  const dibujarPersonaje = () => {
+  // Función para dibujar un personaje
+  const dibujarPersonaje = (personaje) => {
       ctx.fillStyle = personaje.color;
       ctx.fillRect(personaje.x, personaje.y, personaje.width, personaje.height);
+
+      // Dibujar las vidas del personaje
+      ctx.fillStyle = "black";
+      ctx.font = "20px Arial";
+      if (personaje === personaje2) {
+          ctx.fillText(`Vidas: ${personaje.vidas}`, canvas.width - 100, 20);
+      } else {
+          ctx.fillText(`Vidas: ${personaje.vidas}`, 10, 20);
+      }
   };
 
   // Función para dibujar los obstáculos
@@ -56,15 +78,23 @@ document.addEventListener("DOMContentLoaded", () => {
       for (let i = balas.length - 1; i >= 0; i--) {
           switch (balas[i].direccion) {
               case "ArrowUp":
+              case "w":
+          case "W":
                   balas[i].y -= balas[i].speed;
                   break;
               case "ArrowDown":
+              case "s":
+          case "S":
                   balas[i].y += balas[i].speed;
                   break;
               case "ArrowLeft":
+              case "a":
+          case "A":
                   balas[i].x -= balas[i].speed;
                   break;
               case "ArrowRight":
+              case "d":
+          case "D":
                   balas[i].x += balas[i].speed;
                   break;
           }
@@ -120,7 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // Función para detectar colisiones del personaje con obstáculos
-  const detectarColision = () => {
+  const detectarColision = (personaje) => {
       for (let obstaculo of obstaculos) {
           if (
               personaje.x < obstaculo.x + obstaculo.width &&
@@ -128,14 +158,21 @@ document.addEventListener("DOMContentLoaded", () => {
               personaje.y < obstaculo.y + obstaculo.height &&
               personaje.y + personaje.height > obstaculo.y
           ) {
-              // Colisión detectada
+              // Colisión detectada, reducir las vidas
+              personaje.vidas -= 1;
+              if (personaje.vidas <= 0) {
+
+                  personaje.vidas = 3; // Reiniciar vidas para una nueva partida
+                  personaje.x = personaje === personaje2 ? 700 : 50; // Reiniciar posición del personaje
+                  personaje.y = personaje === personaje2 ? 500 : 50;
+              }
               return;
           }
       }
   };
 
   // Función para disparar balas en la dirección del movimiento actual
-  const dispararBala = () => {
+  const dispararBala = (personaje) => {
       const nuevaBala = {
           x: personaje.x + personaje.width / 2,
           y: personaje.y + personaje.height / 2,
@@ -147,7 +184,7 @@ document.addEventListener("DOMContentLoaded", () => {
       };
 
       // Ajustar el tamaño de la bala según la dirección
-      if (nuevaBala.direccion === "ArrowUp" || nuevaBala.direccion === "ArrowDown") {
+      if (nuevaBala.direccion === "ArrowUp" || nuevaBala.direccion === "ArrowDown" || nuevaBala.direccion === "KeyW" || nuevaBala.direccion === "KeyS") {
           nuevaBala.width = 5;
           nuevaBala.height = 10;
       }
@@ -158,6 +195,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Función para mover el personaje
   const moverPersonaje = (event) => {
       switch (event.key) {
+          // Controles del primer personaje
           case "ArrowUp":
               personaje.y -= personaje.speed;
               personaje.direccion = "ArrowUp";
@@ -175,25 +213,50 @@ document.addEventListener("DOMContentLoaded", () => {
               personaje.direccion = "ArrowRight";
               break;
           case " ":
-              dispararBala();
+              dispararBala(personaje);
+              break;
+
+          // Controles del segundo personaje
+          case "KeyW":
+              personaje2.y -= personaje2.speed;
+              personaje2.direccion = "KeyW";
+              break;
+          case "KeyS":
+              personaje2.y += personaje2.speed;
+              personaje2.direccion = "KeyS";
+              break;
+          case "KeyA":
+              personaje2.x -= personaje2.speed;
+              personaje2.direccion = "KeyA";
+              break;
+          case "KeyD":
+              personaje2.x += personaje2.speed;
+              personaje2.direccion = "KeyD";
+              break;
+          case "Enter":
+              dispararBala(personaje2);
               break;
       }
 
-      // Detección de colisiones con los bordes del canvas
-      if (personaje.x < 0) personaje.x = 0;
-      if (personaje.y < 0) personaje.y = 0;
-      if (personaje.x + personaje.width > canvas.width) personaje.x = canvas.width - personaje.width;
-      if (personaje.y + personaje.height > canvas.height) personaje.y = canvas.height - personaje.height;
+      // Detección de colisiones con los bordes del canvas para ambos personajes
+      [personaje, personaje2].forEach(p => {
+          if (p.x < 0) p.x = 0;
+          if (p.y < 0) p.y = 0;
+          if (p.x + p.width > canvas.width) p.x = canvas.width - p.width;
+          if (p.y + p.height > canvas.height) p.y = canvas.height - p.height;
+      });
 
-      // Verificar si hay una colisión con algún obstáculo
-      detectarColision();
+      // Verificar si hay una colisión con algún obstáculo para ambos personajes
+      detectarColision(personaje);
+      detectarColision(personaje2);
   };
 
   // Función para dibujar todo el escenario
   const dibujarTodo = () => {
       // Limpiar el canvas y dibujar de nuevo
       dibujarFondo();
-      dibujarPersonaje();
+      dibujarPersonaje(personaje);
+      dibujarPersonaje(personaje2);
       dibujarObstaculos();
       dibujarBalas();
   };
@@ -204,7 +267,8 @@ document.addEventListener("DOMContentLoaded", () => {
       moverBalas();                      // Mover balas
       detectarColisionBalasObstaculos(); // Detectar colisiones entre balas y obstáculos
       dibujarTodo();                     // Redibujar todo
-      detectarColision();                // Detectar colisiones del personaje
+      detectarColision(personaje);       // Detectar colisiones del personaje 1
+      detectarColision(personaje2);      // Detectar colisiones del personaje 2
       requestAnimationFrame(gameLoop);   // Llamar a gameLoop de nuevo
   };
 
