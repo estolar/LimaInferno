@@ -12,11 +12,11 @@ document.addEventListener("DOMContentLoaded", () => {
       speed: 5
   };
 
-  // Lista de obstáculos
+  // Lista de obstáculos con velocidad
   const obstaculos = [
-      { x: 200, y: 150, width: 50, height: 50, color: "red" },
-      { x: 400, y: 300, width: 50, height: 50, color: "red" },
-      { x: 600, y: 100, width: 50, height: 50, color: "red" }
+      { x: 200, y: 150, width: 50, height: 50, color: "red", speedX: 2, speedY: 2 },
+      { x: 400, y: 300, width: 50, height: 50, color: "red", speedX: -3, speedY: 2 },
+      { x: 600, y: 100, width: 50, height: 50, color: "red", speedX: 1, speedY: -2 }
   ];
 
   // Función para dibujar el fondo
@@ -36,6 +36,23 @@ document.addEventListener("DOMContentLoaded", () => {
       obstaculos.forEach(obstaculo => {
           ctx.fillStyle = obstaculo.color;
           ctx.fillRect(obstaculo.x, obstaculo.y, obstaculo.width, obstaculo.height);
+      });
+  };
+
+  // Función para mover los obstáculos
+  const moverObstaculos = () => {
+      obstaculos.forEach(obstaculo => {
+          // Actualizar la posición del obstáculo
+          obstaculo.x += obstaculo.speedX;
+          obstaculo.y += obstaculo.speedY;
+
+          // Rebotar cuando alcance los bordes del canvas
+          if (obstaculo.x <= 0 || obstaculo.x + obstaculo.width >= canvas.width) {
+              obstaculo.speedX *= -1; // Cambiar dirección en X
+          }
+          if (obstaculo.y <= 0 || obstaculo.y + obstaculo.height >= canvas.height) {
+              obstaculo.speedY *= -1; // Cambiar dirección en Y
+          }
       });
   };
 
@@ -77,9 +94,6 @@ document.addEventListener("DOMContentLoaded", () => {
       if (personaje.x + personaje.width > canvas.width) personaje.x = canvas.width - personaje.width;
       if (personaje.y + personaje.height > canvas.height) personaje.y = canvas.height - personaje.height;
 
-      // Redibujar todo
-      dibujarTodo();
-
       // Verificar si hay una colisión con algún obstáculo
       detectarColision();
   };
@@ -92,9 +106,17 @@ document.addEventListener("DOMContentLoaded", () => {
       dibujarObstaculos();
   };
 
+  // Bucle principal del juego
+  const gameLoop = () => {
+      moverObstaculos();    // Mover obstáculos
+      dibujarTodo();        // Redibujar todo
+      detectarColision();   // Detectar colisiones
+      requestAnimationFrame(gameLoop); // Llamar a gameLoop de nuevo
+  };
+
   // Event listener para el teclado
   window.addEventListener("keydown", moverPersonaje);
 
-  // Dibujar el escenario inicialmente
-  dibujarTodo();
+  // Iniciar el bucle del juego
+  gameLoop();
 });
