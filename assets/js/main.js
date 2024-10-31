@@ -98,7 +98,28 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   };
 
-  // Función para detectar colisiones
+  // Función para detectar colisiones entre balas y obstáculos
+  const detectarColisionBalasObstaculos = () => {
+      for (let i = balas.length - 1; i >= 0; i--) {
+          for (let j = obstaculos.length - 1; j >= 0; j--) {
+              const bala = balas[i];
+              const obstaculo = obstaculos[j];
+              if (
+                  bala.x < obstaculo.x + obstaculo.width &&
+                  bala.x + bala.width > obstaculo.x &&
+                  bala.y < obstaculo.y + obstaculo.height &&
+                  bala.y + bala.height > obstaculo.y
+              ) {
+                  // Eliminar el obstáculo y la bala cuando colisionen
+                  obstaculos.splice(j, 1);
+                  balas.splice(i, 1);
+                  break; // Salir del bucle de obstáculos una vez que se haya detectado una colisión
+              }
+          }
+      }
+  };
+
+  // Función para detectar colisiones del personaje con obstáculos
   const detectarColision = () => {
       for (let obstaculo of obstaculos) {
           if (
@@ -179,11 +200,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Bucle principal del juego
   const gameLoop = () => {
-      moverObstaculos();    // Mover obstáculos
-      moverBalas();         // Mover balas
-      dibujarTodo();        // Redibujar todo
-      detectarColision();   // Detectar colisiones
-      requestAnimationFrame(gameLoop); // Llamar a gameLoop de nuevo
+      moverObstaculos();                 // Mover obstáculos
+      moverBalas();                      // Mover balas
+      detectarColisionBalasObstaculos(); // Detectar colisiones entre balas y obstáculos
+      dibujarTodo();                     // Redibujar todo
+      detectarColision();                // Detectar colisiones del personaje
+      requestAnimationFrame(gameLoop);   // Llamar a gameLoop de nuevo
   };
 
   // Event listener para el teclado
