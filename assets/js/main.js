@@ -9,7 +9,8 @@ document.addEventListener("DOMContentLoaded", () => {
       width: 30,
       height: 30,
       color: "blue",
-      speed: 5
+      speed: 5,
+      direccion: "ArrowRight" // Dirección inicial del personaje
   };
 
   // Lista de obstáculos con velocidad
@@ -53,10 +54,28 @@ document.addEventListener("DOMContentLoaded", () => {
   // Función para mover las balas
   const moverBalas = () => {
       for (let i = balas.length - 1; i >= 0; i--) {
-          balas[i].x += balas[i].speed;
+          switch (balas[i].direccion) {
+              case "ArrowUp":
+                  balas[i].y -= balas[i].speed;
+                  break;
+              case "ArrowDown":
+                  balas[i].y += balas[i].speed;
+                  break;
+              case "ArrowLeft":
+                  balas[i].x -= balas[i].speed;
+                  break;
+              case "ArrowRight":
+                  balas[i].x += balas[i].speed;
+                  break;
+          }
 
           // Eliminar balas que salgan del canvas
-          if (balas[i].x > canvas.width) {
+          if (
+              balas[i].x > canvas.width ||
+              balas[i].x < 0 ||
+              balas[i].y > canvas.height ||
+              balas[i].y < 0
+          ) {
               balas.splice(i, 1);
           }
       }
@@ -94,16 +113,24 @@ document.addEventListener("DOMContentLoaded", () => {
       }
   };
 
-  // Función para disparar balas
+  // Función para disparar balas en la dirección del movimiento actual
   const dispararBala = () => {
       const nuevaBala = {
-          x: personaje.x + personaje.width,
-          y: personaje.y + personaje.height / 2 - 5,
+          x: personaje.x + personaje.width / 2,
+          y: personaje.y + personaje.height / 2,
           width: 10,
           height: 5,
           color: "black",
-          speed: 7
+          speed: 7,
+          direccion: personaje.direccion // Usar la dirección actual del personaje
       };
+
+      // Ajustar el tamaño de la bala según la dirección
+      if (nuevaBala.direccion === "ArrowUp" || nuevaBala.direccion === "ArrowDown") {
+          nuevaBala.width = 5;
+          nuevaBala.height = 10;
+      }
+
       balas.push(nuevaBala);
   };
 
@@ -112,15 +139,19 @@ document.addEventListener("DOMContentLoaded", () => {
       switch (event.key) {
           case "ArrowUp":
               personaje.y -= personaje.speed;
+              personaje.direccion = "ArrowUp";
               break;
           case "ArrowDown":
               personaje.y += personaje.speed;
+              personaje.direccion = "ArrowDown";
               break;
           case "ArrowLeft":
               personaje.x -= personaje.speed;
+              personaje.direccion = "ArrowLeft";
               break;
           case "ArrowRight":
               personaje.x += personaje.speed;
+              personaje.direccion = "ArrowRight";
               break;
           case " ":
               dispararBala();
